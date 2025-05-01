@@ -1,120 +1,217 @@
-﻿namespace ApiDataFetcher.Models.Response
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+
+namespace ApiDataFetcher.Models.Response
 {
-    public class DailyTotalsResponse
+    public record DailyTotalsResponse
     {
-        public DailyTotalsSales? Sales { get; set; }
-        public DailyTotalsTaxes? Taxes { get; set; }
-        public DailyTotalsPayments? Payments { get; set; }
-        public DailyTotalsDiscounts? Discounts { get; set; }
-        public DailyTotalsUsers? Users { get; set; }
-        public DailyTotalsStatistics? Statistics { get; set; }
-        public bool Success { get; set; }
-        public string? Message { get; set; }
+        [JsonProperty("Sales")]
+        public Sales? Sales { get; init; }
+
+        [JsonProperty("Gratuities")]
+        public Gratuities? Gratuities { get; init; }
+
+        [JsonProperty("ServiceCharges")]
+        public ServiceCharges? ServiceCharges { get; init; }
+
+        [JsonProperty("Taxes")]
+        public Taxes? Taxes { get; init; }
+
+        [JsonProperty("Payments")]
+        public Payments? Payments { get; init; }
+
+        [JsonProperty("Discounts")]
+        public Discounts? Discounts { get; init; }
+
+        [JsonProperty("Statistics")]
+        public Statistics? Statistics { get; init; }
     }
 
-    // Sales
-    public class DailyTotalsSales
+    public record Sales
     {
-        public List<SalesItem>? Items { get; set; }
-        public decimal TotalQuantity { get; set; }
-        public decimal TotalGrossAmount { get; set; }
-        public decimal TotalRefundAmount { get; set; }
-        public decimal TotalDiscountAmount { get; set; }
-        public decimal TotalNetAmount { get; set; }
+        [JsonProperty("Items")]
+        public IReadOnlyList<SalesItem> Items { get; init; } = [];
+
+        [JsonProperty("TotalQuantity")]
+        public decimal TotalQuantity { get; init; }
+
+        [JsonProperty("TotalGrossAmount")]
+        public decimal TotalGrossAmount { get; init; }
+
+        [JsonProperty("TotalRefundAmount")]
+        public decimal TotalRefundAmount { get; init; }
+
+        [JsonProperty("TotalDiscountAmount")]
+        public decimal TotalDiscountAmount { get; init; }
+
+        [JsonProperty("TotalNetAmount")]
+        public decimal TotalNetAmount { get; init; }
     }
 
-    public class SalesItem
+    public record SalesItem
     {
-        public string? Name { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal GrossAmount { get; set; }
-        public decimal RefundAmount { get; set; }
-        public decimal DiscountAmount { get; set; }
-        public decimal NetAmount { get; set; }
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("GrossAmount")]
+        public decimal GrossAmount { get; init; }
+
+        [JsonProperty("RefundAmount")]
+        public decimal RefundAmount { get; init; }
+
+        [JsonProperty("DiscountAmount")]
+        public decimal DiscountAmount { get; init; }
+
+        [JsonProperty("NetAmount")]
+        public decimal NetAmount { get; init; }
     }
 
-    // Taxes
-    public class DailyTotalsTaxes
+    public record Gratuities
     {
-        public List<TaxesItem>? Items { get; set; }
-        public decimal TotalQuantity { get; set; }
-        public decimal TotalAmount { get; set; }
+        [JsonProperty("Items")]
+        public IReadOnlyList<GratuityItem> Items { get; init; } = [];
+
+        [JsonProperty("TotalQuantity")]
+        public decimal TotalQuantity { get; init; }
+
+        [JsonProperty("TotalAmount")]
+        public decimal TotalAmount { get; init; }
     }
 
-    public class TaxesItem
+    public record GratuityItem
     {
-        public string? Name { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal Amount { get; set; }
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("Amount")]
+        public decimal Amount { get; init; }
     }
 
-    // Payments
-    public class DailyTotalsPayments
+    public record ServiceCharges
     {
-        public List<PaymentsItem>? Items { get; set; }
-        public decimal TotalQuantity { get; set; }
-        public decimal TotalAmount { get; set; }
+        [JsonProperty("Items")]
+        public IReadOnlyList<ServiceChargeItem> Items { get; init; } = [];
+
+        [JsonProperty("TotalQuantity")]
+        public decimal TotalQuantity { get; init; }
+
+        [JsonProperty("TotalAmount")]
+        public decimal TotalAmount { get; init; }
     }
 
-    public class PaymentsItem
+    public record ServiceChargeItem
     {
-        public string? Name { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal Amount { get; set; }
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("Amount")]
+        public decimal Amount { get; init; }
     }
 
-    // Discounts
-    public class DailyTotalsDiscounts
+    public record Taxes
     {
-        public List<DiscountsItem>? Items { get; set; }
-        public decimal TotalQuantity { get; set; }
-        public decimal TotalAmount { get; set; }
+        [JsonProperty("Items")]
+        public IReadOnlyList<TaxItem> Items { get; init; } = [];
+
+        [JsonProperty("TotalQuantity")]
+        public decimal TotalQuantity { get; init; }
+
+        [JsonProperty("TotalAmount")]
+        public decimal TotalAmount { get; init; }
     }
 
-    public class DiscountsItem
+    public record TaxItem
     {
-        public string? Name { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal Amount { get; set; }
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("Amount")]
+        public decimal Amount { get; init; }
     }
 
-    // Users
-    public class DailyTotalsUsers
+    public record Payments
     {
-        public List<UsersItem>? Items { get; set; }
-        public decimal TotalQuantity { get; set; }
-        public decimal TotalGrossAmount { get; set; }
-        public decimal TotalRefundAmount { get; set; }
-        public decimal TotalDiscountAmount { get; set; }
-        public decimal TotalNetAmount { get; set; }
+        [JsonProperty("Items")]
+        public IReadOnlyList<PaymentItem> Items { get; init; } = [];
+
+        [JsonProperty("TotalQuantity")]
+        public decimal TotalQuantity { get; init; }
+
+        [JsonProperty("TotalAmount")]
+        public decimal TotalAmount { get; init; }
     }
 
-    public class UsersItem
+    public record PaymentItem
     {
-        public string? Name { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal GrossAmount { get; set; }
-        public decimal RefundAmount { get; set; }
-        public decimal DiscountAmount { get; set; }
-        public decimal NetAmount { get; set; }
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("Amount")]
+        public decimal Amount { get; init; }
     }
 
-    // Statistics
-    public class DailyTotalsStatistics
+    public record Discounts
     {
-        public DateTime PeriodStart { get; set; }
-        public DateTime PeriodEnd { get; set; }
-        public decimal TotalHours { get; set; }
-        public decimal AvgHourGross { get; set; }
-        public decimal AvgHourNet { get; set; }
-        public decimal AvgGuestHour { get; set; }
-        public int CheckCount { get; set; }
-        public decimal AvgCheckGross { get; set; }
-        public decimal AvgCheckNet { get; set; }
-        public int EntreeCount { get; set; }
-        public int GuestCount { get; set; }
-        public decimal AvgGuestGross { get; set; }
-        public decimal AvgGuestNet { get; set; }
-        public decimal AverageStay { get; set; }
+        [JsonProperty("Items")]
+        public IReadOnlyList<DiscountItem> Items { get; init; } = [];
+
+        [JsonProperty("TotalQuantity")]
+        public decimal TotalQuantity { get; init; }
+
+        [JsonProperty("TotalAmount")]
+        public decimal TotalAmount { get; init; }
+    }
+
+    public record DiscountItem
+    {
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("Amount")]
+        public decimal Amount { get; init; }
+    }
+
+    public record Statistics
+    {
+        [Required]
+        [JsonProperty("PeriodStart")]
+        public required DateTime PeriodStart { get; init; }
+
+        [Required]
+        [JsonProperty("PeriodEnd")]
+        public required DateTime PeriodEnd { get; init; }
+
+        [JsonProperty("TotalHours")]
+        public double? TotalHours { get; init; }
+
+        [JsonProperty("CheckCount")]
+        public double? CheckCount { get; init; }
+
+        [JsonProperty("GuestCount")]
+        public double? GuestCount { get; init; }
     }
 }

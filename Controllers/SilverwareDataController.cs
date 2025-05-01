@@ -8,14 +8,9 @@ namespace ApiDataFetcher.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Client)]
-    public class SilverwareDataController : ControllerBase
+    public class SilverwareDataController(ISilverwareDataFetcher apiService) : ControllerBase
     {
-        private readonly ISilverwareDataFetcher _apiService;
-
-        public SilverwareDataController(ISilverwareDataFetcher apiService)
-        {
-            _apiService = apiService;
-        }
+        private readonly ISilverwareDataFetcher _apiService = apiService;
 
         [HttpPost("daily-totals")]
         public async Task<ActionResult<DailyTotalsResponse>> GetDailyTotals([FromBody] DailyTotalsRequest request)
@@ -24,14 +19,14 @@ namespace ApiDataFetcher.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get-orders")]
+        [HttpGet("orders")]
         public async Task<ActionResult<GetOrdersResponse>> GetOrders([FromQuery] GetOrdersRequest request)
         {
             var response = await _apiService.GetOrdersAsync(request);
             return Ok(response);
         }
 
-        [HttpGet("get-order")]
+        [HttpGet("order")]
         public async Task<ActionResult<GetOrderRequest>> GetOrder([FromQuery] GetOrderRequest request)
         {
             var response = await _apiService.GetOrderAsync(request);

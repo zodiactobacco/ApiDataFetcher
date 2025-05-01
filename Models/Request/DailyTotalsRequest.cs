@@ -1,31 +1,48 @@
-﻿using ApiDataFetcher.Models.Validators;
+﻿using ApiDataFetcher.Models.Converters;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace ApiDataFetcher.Models.Request
 {
-    public class DailyTotalsRequest
+    public record DailyTotalsRequest
     {
         [Required]
-        [ValidFormat("yyyy-MM-dd")]
-        public required string BusinessDateFrom { get; set; }
+        [JsonConverter(typeof(DateOnlyConverter))]
+        public DateOnly BusinessDateFrom { get; init; }
 
         [Required]
-        [ValidFormat("yyyy-MM-dd")]
-        public required string BusinessDateTo { get; set; }
+        [JsonConverter(typeof(DateOnlyConverter))]
+        public DateOnly BusinessDateTo { get; init; }
 
-        [ValidFormat("HH:mm")]
-        public string? FromTime { get; set; }
+        [JsonConverter(typeof(TimeOnlyConverter))]
+        public TimeOnly? FromTime { get; init; }
 
-        [ValidFormat("HH:mm")]
-        public string? ToTime { get; set; }
-        public List<Guid>? CostCenterIDs { get; set; }
-        public List<Guid>? SegmentIDs { get; set; }
-        public List<Guid>? UserIDs { get; set; }
+        [JsonConverter(typeof(TimeOnlyConverter))]
+        public TimeOnly? ToTime { get; init; }
 
-        [Range(0, 1, ErrorMessage = "ReportBy must be either 0 (UserClosed) or 1 (UserOpened).")]
-        public byte? ReportBy { get; set; }
+        public IReadOnlyList<Guid>? CostCenters { get; init; }
 
-        [Range(0, 2, ErrorMessage = "Status must be 0 (All), 1 (Closed), or 2 (Opened).")]
-        public byte? Status { get; set; }
+        public IReadOnlyList<Guid>? Segments { get; init; }
+
+        public IReadOnlyList<Guid>? Users { get; init; }
+
+        [EnumDataType(typeof(ReportByOption))]
+        public ReportByOption? ReportBy { get; init; }
+
+        [EnumDataType(typeof(StatusOption))]
+        public StatusOption? Status { get; init; }
+    }
+
+    public enum ReportByOption
+    {
+        UserClosed,
+        UserOpened
+    }
+
+    public enum StatusOption
+    {
+        All,
+        Closed,
+        Opened
     }
 }

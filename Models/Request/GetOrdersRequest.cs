@@ -1,17 +1,25 @@
-﻿using ApiDataFetcher.Models.Validators;
+﻿using ApiDataFetcher.Models.Converters;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace ApiDataFetcher.Models.Request
 {
-    public class GetOrdersRequest
+    public record GetOrdersRequest
     {
         [Required]
-        [ValidFormat("yyyy-MM-dd")]
-        public required string Date { get; set; }
+        [JsonConverter(typeof(DateOnlyConverter))]
+        public DateOnly Date { get; init; }
 
         [Required]
-        [MinLength(1, ErrorMessage = "Statuses list cannot be empty.")]
-        [ValidStatuses([0, 1, 2, 3])]
-        public required HashSet<byte> Statuses { get; set; }
+        [MinLength(1)]
+        public required HashSet<Statuses> Statuses { get; init; }
+    }
+
+    public enum Statuses
+    {
+        Open,
+        Closed,
+        Voided,
+        Unsplit
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IHttpClientWrapper
     {
-        Task<TResponse> PostAsync<TRequest, TResponse>(string endpoint, string token, TRequest request);
+        Task<TResponse> PostAsync<TRequest, TResponse>(string url, string token, TRequest request);
     }
 }

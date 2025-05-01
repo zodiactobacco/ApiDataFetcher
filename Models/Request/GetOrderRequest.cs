@@ -2,9 +2,9 @@
 
 namespace ApiDataFetcher.Models.Request
 {
-    public class GetOrderRequest
+    public record GetOrderRequest
     {
         [Required]
-        public Guid OrderId { get; set; }
+        public Guid OrderId { get; init; }
     }
 }

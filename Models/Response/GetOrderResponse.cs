@@ -1,163 +1,155 @@
-﻿namespace ApiDataFetcher.Models.Response
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+
+namespace ApiDataFetcher.Models.Response
 {
-
-    public class GetOrderResponse
+    public record GetOrderResponse
     {
-        public Order? Order { get; set; }
-        public bool Success { get; set; }
-        public string? Message { get; set; }
+        [JsonProperty("Order")]
+        public Order? Order { get; init; }
     }
 
-    public class Order
+    public record Order
     {
-        public required string ID { get; set; }
-        public double OrderNumber { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? CloseDate { get; set; }
-        public bool IsFuture { get; set; }
-        public double LastBatch { get; set; }
-        public List<Check>? Checks { get; set; }
-        public List<Guest>? Guests { get; set; }
-        public double Total { get; set; }
-        public double TaxTotal { get; set; }
-        public double SubTotal { get; set; }
-        public double GratuityTotal { get; set; }
-        public string? HotelGuest { get; set; }
+        [Required]
+        [JsonProperty("ID")]
+        public required string Id { get; init; }
+
+        [Required]
+        [JsonProperty("OrderNumber")]
+        public required string OrderNumber { get; init; }
+
+        [JsonProperty("StartDate")]
+        public DateTime StartDate { get; init; }
+
+        [JsonProperty("CloseDate")]
+        public DateTime? CloseDate { get; init; }
+
+        [JsonProperty("Total")]
+        public decimal Total { get; init; }
+
+        [JsonProperty("TaxTotal")]
+        public decimal TaxTotal { get; init; }
+
+        [JsonProperty("SubTotal")]
+        public decimal SubTotal { get; init; }
+
+        [JsonProperty("GratuityTotal")]
+        public decimal GratuityTotal { get; init; }
+
+        [JsonProperty("Checks")]
+        public IReadOnlyList<Check> Checks { get; init; } = [];
+
+        [JsonProperty("Guests")]
+        public IReadOnlyList<Guest> Guests { get; init; } = [];
+
+        [JsonProperty("GuestType")]
+        public string? GuestType { get; init; }
     }
 
-    public class Check
+    public record Check
     {
-        public required string ID { get; set; }
-        public double CheckNumber { get; set; }
-        public double Status { get; set; }
-        public DateTime? CloseDate { get; set; }
-        public double Total { get; set; }
-        public double TaxTotal { get; set; }
-        public double SubTotal { get; set; }
-        public double GratuityTotalIncludingTax { get; set; }
-        public List<Item>? Items { get; set; }
-        public List<Taxes>? Taxes { get; set; }
-        public List<Payment>? Payments { get; set; }
+        [Required]
+        [JsonProperty("CheckNumber")]
+        public required string CheckNumber { get; init; }
+
+        [JsonProperty("CloseDate")]
+        public DateTime? CloseDate { get; init; }
+
+        [JsonProperty("Total")]
+        public decimal Total { get; init; }
+
+        [JsonProperty("TaxTotal")]
+        public decimal TaxTotal { get; init; }
+
+        [JsonProperty("SubTotal")]
+        public decimal SubTotal { get; init; }
+
+        [JsonProperty("GratuityTotalIncludingTax")]
+        public decimal GratuityTotalIncludingTax { get; init; }
+
+        [JsonProperty("Items")]
+        public IReadOnlyList<OrderItem> Items { get; init; } = [];
+
+        [JsonProperty("Taxes")]
+        public IReadOnlyList<Tax> Taxes { get; init; } = [];
+
+        [JsonProperty("Payments")]
+        public IReadOnlyList<Payment> Payments { get; init; } = [];
+
+        [JsonProperty("Gratuities")]
+        public IReadOnlyList<Gratuity> Gratuities { get; init; } = [];
     }
 
-    public class Item
+    public record OrderItem
     {
-        public required string ID { get; set; }
-        public string? GuestID { get; set; }
-        public double Sequence { get; set; }
-        public double Course { get; set; }
-        public double Qnty { get; set; }
-        public double OriginalAmount { get; set; }
-        public double TargetAmount { get; set; }
-        public double CalculatedAmount { get; set; }
-        public DateTime? DateEntered { get; set; }
-        public List<Modifier>? Modifiers { get; set; }
-        public List<Discount>? Discounts { get; set; }
-        public DateTime? DateRefunded { get; set; }
-        public DateTime? DateSent { get; set; }
-        public double Batch { get; set; }
-        public MenuItem? MenuItem { get; set; }
-        public Price? Price { get; set; }
-        public User? User { get; set; }
-        public DateTime? DateVoided { get; set; }
+        [Required]
+        [JsonProperty("Description")]
+        public required string Description { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("CalculatedAmount")]
+        public decimal CalculatedAmount { get; init; }
+
+        [JsonProperty("Modifiers")]
+        public IReadOnlyList<Modifier> Modifiers { get; init; } = [];
     }
 
-    public class Modifier
+    public record Modifier
     {
-        public required string ID { get; set; }
-        public string? GuestID { get; set; }
-        public double Sequence { get; set; }
-        public double Course { get; set; }
-        public double Qnty { get; set; }
-        public double OriginalAmount { get; set; }
-        public double TargetAmount { get; set; }
-        public double CalculatedAmount { get; set; }
-        public DateTime? DateEntered { get; set; }
-        public DateTime? DateSent { get; set; }
-        public double Batch { get; set; }
-        public string? MiscData { get; set; }
-        public MenuItem? MenuItem { get; set; }
-        public Price? Price { get; set; }
+        [Required]
+        [JsonProperty("Description")]
+        public required string Description { get; init; }
+
+        [JsonProperty("Quantity")]
+        public decimal Quantity { get; init; }
+
+        [JsonProperty("CalculatedAmount")]
+        public decimal CalculatedAmount { get; init; }
     }
 
-    public class Discount
+    public record Tax
     {
-        public required string ID { get; set; }
-        public string? OrderItemID { get; set; }
-        public double Value { get; set; }
-        public DateTime? DateEntered { get; set; }
-        public DateTime? DateAuthorized { get; set; }
-        public DiscountReason? DiscountReason { get; set; }
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("TaxAmount")]
+        public decimal TaxAmount { get; init; }
     }
 
-    public class DiscountReason
+    public record Payment
     {
-        public required string ID { get; set; }
-        public string? Name { get; set; }
-        public bool IsCheckLevel { get; set; }
+        [Required]
+        [JsonProperty("MethodName")]
+        public required string PaymentMethod { get; init; }
+
+        [JsonProperty("PayAmount")]
+        public decimal PayAmount { get; init; }
     }
 
-    public class Client
+    public record Gratuity
     {
-        public required string ID { get; set; }
-        public int ClientType { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? Email { get; set; }
-        public string? CompanyName { get; set; }
-        public string? Telephone { get; set; }
-    }
-    public class Guest
-    {
-        public required string ID { get; set; }
-        public string? SeatID { get; set; }
-        public Client? Client { get; set; }
-        public double Sequence { get; set; }
-        public string? Sex { get; set; }
-        public int Type { get; set; }
+        [Required]
+        [JsonProperty("Name")]
+        public required string Name { get; init; }
+
+        [JsonProperty("Amount")]
+        public decimal Amount { get; init; }
     }
 
-    public class MenuItem
+    public record Guest
     {
-        public required string ID { get; set; }
-        public string? Description { get; set; }
-    }
-    public class Payment
-    {
-        public required string ID { get; set; }
-        public string? ClientID { get; set; }
-        public double TipAmount { get; set; }
-        public double PayAmount { get; set; }
-        public double ForeignPayAmount { get; set; }
-        public bool CashBack { get; set; }
-        public bool ChangeDue { get; set; }
-        public bool Deposit { get; set; }
-        public DateTime? DateEntered { get; set; }
-        public User? User { get; set; }
-    }
+        [Required]
+        [JsonProperty("ID")]
+        public required string Id { get; init; }
 
-    public class Price
-    {
-        public int PriceType { get; set; }
-        public double Amount { get; set; }
-        public bool AmountIncludesTax { get; set; }
-    }
+        [JsonProperty("Sequence")]
+        public int Sequence { get; init; }
 
-    public class Taxes
-    {
-        public required string ID { get; set; }
-        public string? Name { get; set; }
-        public double Rate { get; set; }
-        public double TaxAmount { get; set; }
-        public double SubTotal { get; set; }
-        public double Qty { get; set; }
-    }
-
-    public class User
-    {
-        public required string ID { get; set; }
-        public string? Alias { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
+        [JsonProperty("Type")]
+        public int Type { get; init; }
     }
 }

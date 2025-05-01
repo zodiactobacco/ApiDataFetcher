@@ -6,46 +6,33 @@ using System.Text;
 
 namespace ApiDataFetcher.Services
 {
-    public class HttpClientWrapper : IHttpClientWrapper
+    public class HttpClientWrapper(HttpClient httpClient, ILogger<HttpClientWrapper> logger) : IHttpClientWrapper
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<HttpClientWrapper> _logger;
+        private readonly HttpClient _httpClient = httpClient;
+        private readonly ILogger<HttpClientWrapper> _logger = logger;
 
-        public HttpClientWrapper(HttpClient httpClient, ILogger<HttpClientWrapper> logger)
+        public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, string token, TRequest request)
         {
-            _httpClient = httpClient;
-            _logger = logger;
-        }
-
-        public async Task<TResponse> PostAsync<TRequest, TResponse>(string endpoint, string token, TRequest request)
-        {
-            AddAuthorizationHeader(token);
-
             var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            _logger.LogDebug("Sending POST request to {Endpoint} with body: {RequestBody}", endpoint, json);
-            var response = await _httpClient.PostAsync(endpoint, content);
+            _logger.LogDebug("Sending POST request to {Endpoint} with body: {RequestBody}", url, json);
+
+            using var response = await _httpClient.SendAsync(requestMessage);
             var result = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("External API {Endpoint} returned error: {StatusCode}, {ErrorContent}", endpoint, response.StatusCode, result);
-                throw new ExternalApiException($"External API {endpoint} failed with status: {response.StatusCode}: {result}", (int)response.StatusCode);
+                _logger.LogError("External API {Endpoint} returned error: {StatusCode}, {ErrorContent}", url, response.StatusCode, result);
+                throw new ExternalApiException($"External API {url} failed with status: {response.StatusCode}: {JsonConvert.DeserializeAnonymousType(result, new { Message = ""})}", (int)response.StatusCode);
             }
 
-            _logger.LogDebug("Received response from {Endpoint}: {Response}", endpoint, result);
+            _logger.LogDebug("Received response from {Endpoint}: {Response}", url, result);
             return JsonConvert.DeserializeObject<TResponse>(result)!;
-        }
-
-        private void AddAuthorizationHeader(string token)
-        {
-            if (string.IsNullOrEmpty(token))
-            {
-                _logger.LogError("Bearer token is not configured.");
-                throw new InvalidOperationException("Bearer token is not configured.");
-            }
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 }

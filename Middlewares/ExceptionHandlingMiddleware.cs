@@ -2,55 +2,53 @@
 using Newtonsoft.Json;
 using System.Net;
 
-namespace ApiDataFetcher.Middlewares
+namespace ApiDataFetcher.Middlewares;
+
+public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
-    public class ExceptionHandlingMiddleware
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger = logger;
+
+    public async Task InvokeAsync(HttpContext context)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+        try
         {
-            _next = next;
-            _logger = logger;
+            await _next(context);
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                await HandleExceptionAsync(context, ex);
-            }
+            await HandleExceptionAsync(context, ex);
         }
+    }
 
-        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var response = context.Response;
+        response.ContentType = "application/json";
+
+        var (statusCode, title, message) = exception switch
         {
-            _logger.LogError(exception, "An unhandled exception occurred: {Message}", exception.Message);
+            ExternalApiException apiEx => ((HttpStatusCode)apiEx.StatusCode, "External API Error", apiEx.Message),
+            ArgumentException argEx => (HttpStatusCode.BadRequest, "Invalid Argument", argEx.Message),
+            InvalidOperationException opEx => (HttpStatusCode.BadRequest, "Invalid Operation", opEx.Message),
+            JsonSerializationException jsonEx => (HttpStatusCode.BadRequest, "Invalid JSON Format", jsonEx.Message),
+            JsonReaderException readerEx => (HttpStatusCode.BadRequest, "Malformed JSON", readerEx.Message),
+            _ => (HttpStatusCode.InternalServerError, "Internal Server Error", "An unexpected error occurred.")
+        };
 
-            var response = context.Response;
-            response.ContentType = "application/json";
+        _logger.LogError(exception, "Unhandled exception: {Message}. Inner: {Inner}", exception.Message, exception.InnerException?.Message);
 
-            var (statusCode, message) = exception switch
-            {
-                ExternalApiException apiEx => ((HttpStatusCode)apiEx.StatusCode, apiEx.Message),
-                ArgumentException argEx => (HttpStatusCode.BadRequest, argEx.Message),
-                InvalidOperationException opEx => (HttpStatusCode.BadRequest, opEx.Message),
-                Exception ex => (HttpStatusCode.InternalServerError, ex.Message)
-            };
+        response.StatusCode = (int)statusCode;
 
-            response.StatusCode = (int)statusCode;
+        var errorResponse = new
+        {
+            status = response.StatusCode,
+            title,
+            message,
+            traceId = context.TraceIdentifier
+        };
 
-            var errorResponse = new
-            {
-                Message = message,
-                Detail = statusCode == HttpStatusCode.InternalServerError ? null : exception.Message
-            };
-
-            await response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
-        }
+        var json = JsonConvert.SerializeObject(errorResponse);
+        await response.WriteAsync(json);
     }
 }

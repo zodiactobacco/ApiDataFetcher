@@ -1,12 +1,19 @@
-﻿namespace ApiDataFetcher.Models.Response
-{
-    public class GetOrdersResponse
-    {
-        public string? StartDate { get; set; }
-        public string? EndDate { get; set; }
-        public List<Guid>? Orders { get; set; }
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-    }
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
+namespace ApiDataFetcher.Models.Response
+{
+    public record GetOrdersResponse
+    {
+        [Required]
+        [JsonProperty("StartDate")]
+        public DateTime StartDate { get; init; }
+
+        [Required]
+        [JsonProperty("EndDate")]
+        public DateTime EndDate { get; init; }
+
+        [JsonProperty("Orders")]
+        public IReadOnlyList<Guid> Orders { get; init; } = [];
+    }
 }

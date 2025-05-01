@@ -1,6 +1,4 @@
-﻿using ApiDataFetcher.Middlewares;
-
-namespace ApiDataFetcher.Middlewares.Extensions
+﻿namespace ApiDataFetcher.Middlewares.Extensions
 {
     public static class ExceptionHandlingMiddlewareExtensions
     {
