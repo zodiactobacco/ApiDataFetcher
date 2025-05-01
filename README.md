@@ -37,7 +37,6 @@ dotnet run
 
 The API will be available at:
 
-HTTP: http://localhost:5119
 HTTPS: https://localhost:7213
 
 Swagger UI opens at: https://localhost:7213/swagger
